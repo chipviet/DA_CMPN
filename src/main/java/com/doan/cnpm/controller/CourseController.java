@@ -18,7 +18,7 @@ import java.util.List;
 import static java.lang.Integer.parseInt;
 
 @RestController
-@RequestMapping("/api/abc")
+@RequestMapping("/api/edu")
 @Transactional
 public class CourseController {
 
