@@ -41,28 +41,13 @@ public class CourseController {
 
     @GetMapping(value="/v1/course")
     public List<Course> getALlCourses(HttpServletRequest request){
-        String username = request.getHeader("username");
-        Optional<User> user = userRepository.findOneByUsername(username);
-        String userId = String.valueOf(user.get().getId());
-        String authority = userAuthorityService.getAuthority(userId);
-        if(authority.equals("ROLE_ADMIN")) {
-            return courseRepository.findAll();
-        }
-        throw new AccessDeniedException();
+        return courseRepository.findAll();
     }
 
     @GetMapping("v1/course/details")
     public ResponseEntity<Course> getCourseDetails (@RequestParam(name = "id") Long id, HttpServletRequest request) {
-
-        String username = request.getHeader("username");
-        Optional<User> user = userRepository.findOneByUsername(username);
-        String userId = String.valueOf(user.get().getId());
-        String authority = userAuthorityService.getAuthority(userId);
-        if(authority.equals("ROLE_ADMIN")) {
-            Course data = courseRepository.findOneById(id);
-            return new ResponseEntity<>(data, HttpStatus.OK);
-        }
-        throw new AccessDeniedException();
+        Course data = courseRepository.findOneById(id);
+        return new ResponseEntity<>(data, HttpStatus.OK);
     }
 
     @PostMapping("v1/course/create")

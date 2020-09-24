@@ -41,28 +41,13 @@ public class NeedController {
 
     @GetMapping(value="/v1/need")
     public List<Need> getALlNeeds(HttpServletRequest request){
-        String username = request.getHeader("username");
-        Optional<User> user = userRepository.findOneByUsername(username);
-        String userId = String.valueOf(user.get().getId());
-        String authority = userAuthorityService.getAuthority(userId);
-        if(authority.equals("ROLE_ADMIN")) {
-            return needRepository.findAll();
-        }
-        throw new AccessDeniedException();
+        return needRepository.findAll();
     }
 
     @GetMapping("v1/need/details")
     public ResponseEntity<Need> getNeedDetails (@RequestParam(name = "id") Long id, HttpServletRequest request) {
-
-        String username = request.getHeader("username");
-        Optional<User> user = userRepository.findOneByUsername(username);
-        String userId = String.valueOf(user.get().getId());
-        String authority = userAuthorityService.getAuthority(userId);
-        if(authority.equals("ROLE_ADMIN")) {
-            Need data = needRepository.findOneById(id);
-            return new ResponseEntity<>(data, HttpStatus.OK);
-        }
-        throw new AccessDeniedException();
+        Need data = needRepository.findOneById(id);
+        return new ResponseEntity<>(data, HttpStatus.OK);
     }
 
     @PostMapping("v1/need/create")
