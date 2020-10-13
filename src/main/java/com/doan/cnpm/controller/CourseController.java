@@ -7,6 +7,7 @@ import com.doan.cnpm.repositories.UserRepository;
 import com.doan.cnpm.service.CourseService;
 import com.doan.cnpm.service.dto.CourseDTO;
 import com.doan.cnpm.service.exception.AccessDeniedException;
+import com.doan.cnpm.service.response.CourseDetailResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.repository.query.Param;
@@ -41,7 +42,7 @@ public class CourseController {
     }
 
     @GetMapping(value="/v1/course")
-    public List<CourseDTO> getALlCourses(HttpServletRequest request){
+    public List<CourseDetailResp> getALlCourses(HttpServletRequest request){
         String username = request.getHeader("username");
         Optional<User> user = userRepository.findOneByUsername(username);
         String userId = String.valueOf(user.get().getId());
@@ -53,7 +54,7 @@ public class CourseController {
     }
 
     @GetMapping("v1/course/details")
-    public CourseDTO getCourseDetails (@RequestParam(name = "id") Long idCourse, HttpServletRequest request) {
+    public CourseDetailResp getCourseDetails (@RequestParam(name = "id") Long idCourse, HttpServletRequest request) {
 
         String username = request.getHeader("username");
         Optional<User> user = userRepository.findOneByUsername(username);
@@ -74,7 +75,7 @@ public class CourseController {
     }
 
     @PutMapping("v1/course/update")
-    @ResponseStatus(HttpStatus.UPGRADE_REQUIRED)
+    //@ResponseStatus(HttpStatus.UPGRADE_REQUIRED)
     public void updateCourse (@RequestBody CourseDTO course, HttpServletRequest request, @RequestParam(name = "id") Long id )  {
         String username = request.getHeader("username");
         Optional<User> user = userRepository.findOneByUsername(username);
@@ -88,7 +89,7 @@ public class CourseController {
     }
 
     @PutMapping("v1/course/join")
-    @ResponseStatus(HttpStatus.UPGRADE_REQUIRED)
+    //@ResponseStatus(HttpStatus.UPGRADE_REQUIRED)
     public void joinCourse(HttpServletRequest request, @RequestParam(name = "idCourse")Long idCourse){
         String username = request.getHeader("username");
         Optional<User> user = userRepository.findOneByUsername(username);
@@ -102,7 +103,7 @@ public class CourseController {
     }
 
     @PutMapping("v1/course/out")
-    @ResponseStatus(HttpStatus.UPGRADE_REQUIRED)
+    //@ResponseStatus(HttpStatus.UPGRADE_REQUIRED)
     public void outCourse(HttpServletRequest request, @RequestParam(name = "idCourse")Long idCourse){
         String username = request.getHeader("username");
         Optional<User> user = userRepository.findOneByUsername(username);

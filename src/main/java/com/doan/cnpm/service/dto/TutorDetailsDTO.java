@@ -17,7 +17,7 @@ public class TutorDetailsDTO {
 
     @NotNull
     @NotBlank
-    private String literacy;
+    private Long literacy;
 
     @NotBlank
     private String username;
@@ -42,11 +42,11 @@ public class TutorDetailsDTO {
         this.subject = subject;
     }
 
-    public String getLiteracy() {
+    public Long getLiteracy() {
         return literacy;
     }
 
-    public void setLiteracy(String literacy) {
+    public void setLiteracy(Long literacy) {
         this.literacy = literacy;
     }
 

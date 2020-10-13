@@ -7,18 +7,21 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
-public class RegisterUserDTO implements Serializable {
+public class UserDetailsDTO implements Serializable {
 
     private static final long serialVersionUID = -921607960706770575L;
+
+
+    @NotNull
+    @NotBlank
+    private Long id;
 
     @NotNull
     @NotBlank
     private String username;
-
-    @NotNull
-    @NotBlank
-    private String password;
 
     @Email
     @NotNull
@@ -37,7 +40,7 @@ public class RegisterUserDTO implements Serializable {
     @NotBlank
     private Boolean gender;
 
-    //@NotNull
+    @NotNull
     @NotBlank
     private String photo;
 
@@ -45,14 +48,6 @@ public class RegisterUserDTO implements Serializable {
     @NotNull
     @NotBlank
     private String address;
-
-    @NotNull
-    @NotBlank
-    private Double latitude;
-
-    @NotNull
-    @NotBlank
-    private Double longitude;
 
     @NotNull
     @NotBlank
@@ -68,11 +63,19 @@ public class RegisterUserDTO implements Serializable {
 
     @NotNull
     @NotBlank
-    private String authority;
+    private String authority ;
 
     @NotNull
     @NotBlank
     private UserStatus status;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getUsername() {
         return username;
@@ -80,14 +83,6 @@ public class RegisterUserDTO implements Serializable {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getEmail() {
@@ -120,22 +115,6 @@ public class RegisterUserDTO implements Serializable {
 
     public void setAddress(String address) {
         this.address = address;
-    }
-
-    public Double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
     }
 
     public Boolean getGender() {

@@ -3,6 +3,7 @@ package com.doan.cnpm.domain;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.Collection;
 
 @Data
 @Entity
@@ -15,6 +16,9 @@ public class Literacy {
 
     @Column(name = "level")
     private String level;
+
+    @OneToMany(mappedBy = "literacy",cascade = CascadeType.ALL)
+    private Collection<TutorDetails> tutorDetails;
 
     public Long getId() {
         return id;
@@ -30,5 +34,13 @@ public class Literacy {
 
     public void setLevel(String level) {
         this.level = level;
+    }
+
+    public Collection<TutorDetails> getTutorDetails() {
+        return tutorDetails;
+    }
+
+    public void setTutorDetails(Collection<TutorDetails> tutorDetails) {
+        this.tutorDetails = tutorDetails;
     }
 }

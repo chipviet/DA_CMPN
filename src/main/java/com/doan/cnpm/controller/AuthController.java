@@ -102,8 +102,8 @@ public class AuthController {
 
     @PostMapping("/v1/user/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public void registerUser(@RequestBody RegisterUserDTO dto) {
-        userService.registerUser(dto);
+    public User registerUser(@RequestBody RegisterUserDTO dto) {
+        return userService.registerUser(dto);
     }
 
     @GetMapping("/v1/users/details")

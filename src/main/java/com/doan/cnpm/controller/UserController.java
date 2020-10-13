@@ -2,32 +2,21 @@ package com.doan.cnpm.controller;
 
 import com.doan.cnpm.domain.User;
 import com.doan.cnpm.repositories.UserRepository;
-import com.doan.cnpm.security.jwt.JWTFilter;
-import com.doan.cnpm.security.jwt.TokenProvider;
 import com.doan.cnpm.service.UserAuthorityService;
 import com.doan.cnpm.service.UserService;
-import com.doan.cnpm.service.dto.LoginDTO;
 import com.doan.cnpm.service.dto.RegisterUserDTO;
+import com.doan.cnpm.service.dto.UserDetailsDTO;
 import com.doan.cnpm.service.exception.AccessDeniedException;
 import com.doan.cnpm.service.exception.UserIsInactiveException;
 import com.doan.cnpm.service.exception.UserNotFoundException;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,34 +54,38 @@ public class UserController {
     }
 
     @GetMapping("/v1/user/details/{id}")
-    public ResponseEntity<User> getUserDetailsById(@PathVariable Long id, HttpServletRequest request) {
+    public UserDetailsDTO getUserDetailsById(@PathVariable Long id, HttpServletRequest request) {
         log.debug("REST request to get TutorDetails : {}", id);
         String username = request.getHeader("username");
         Optional<User> user = userRepository.findOneByUsername(username);
         String userId = String.valueOf(user.get().getId());
         String authority = userAuthorityService.getAuthority(userId);
         if(authority.equals("ROLE_ADMIN")) {
-            Optional<User> tutorDetails = userRepository.findById(id);
-            return ResponseUtil.wrapOrNotFound(tutorDetails);
+            try {
+                UserDetailsDTO resp = userService.getUserDetailsById(id,authority);
+                return resp;
+            } catch (UserIsInactiveException e) {
+                e.printStackTrace();
+            }
         }
         throw new AccessDeniedException();
     }
 
     @GetMapping("/v1/user")
-    public  ResponseEntity<List<User>> getAllUser(HttpServletRequest request) throws UserNotFoundException, UserIsInactiveException {
+    public  ResponseEntity<List<UserDetailsDTO>> getAllUser(HttpServletRequest request) throws UserNotFoundException, UserIsInactiveException {
         String username = request.getHeader("username");
         Optional<User> user = userRepository.findOneByUsername(username);
         String userId = String.valueOf(user.get().getId());
         String authority = userAuthorityService.getAuthority(userId);
         if(authority.equals("ROLE_ADMIN")) {
-            List<User> resp = userService.getAllUser();
+            List<UserDetailsDTO> resp = userService.getALlUser();
             return new ResponseEntity<>(resp, HttpStatus.OK);
         }
         throw new AccessDeniedException();
     }
 
     @PutMapping("v1/user/update")
-    @ResponseStatus(HttpStatus.UPGRADE_REQUIRED)
+    //@ResponseStatus(HttpStatus.UPGRADE_REQUIRED)
     public User updateUser(@RequestParam(name = "idUser")Long idUser, @RequestBody RegisterUserDTO userDTO,HttpServletRequest request ){
         String username = request.getHeader("username");
         Optional<User> user = userRepository.findOneByUsername(username);
@@ -106,18 +99,25 @@ public class UserController {
         return userService.updateUser(userDTO,user);
     }
 
-    @DeleteMapping("v1/user/delete/{id}")
-    public String deleteUser(@RequestParam(name = "idUser")Long idUser,HttpServletRequest request){
+    @DeleteMapping("v1/user/delete")
+    public Long deleteUser(@RequestParam(name = "idUser" )Long idUser,HttpServletRequest request){
         String username = request.getHeader("username");
         Optional<User> user = userRepository.findOneByUsername(username);
         String userId = String.valueOf(user.get().getId());
+        System.out.println(userId);
+
         String authority = userAuthorityService.getAuthority(userId);
         if(authority.equals("ROLE_ADMIN")) {
-            Optional<User> user1 = userRepository.findById(idUser);
-            return userService.deleteUser(user1);
-        }
 
-        return userService.deleteUser(user);
+            Optional<User> user1 = userRepository.findById(idUser);
+            System.out.println(user1.get());
+            userService.deleteUser(user1.get());
+            return idUser;
+            //return "Delete success";
+        }
+        return idUser;
+        //userService.deleteUser(user.get());
+        //return "Delete success";
     }
 
     @PutMapping("v1/user/changeStatus")

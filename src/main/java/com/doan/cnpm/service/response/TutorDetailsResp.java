@@ -1,10 +1,45 @@
 package com.doan.cnpm.service.response;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.HashSet;
+import java.util.Set;
+
 public class TutorDetailsResp {
 
+
+    private Long id;
+
+    @NotNull
+    @NotBlank
+    private Long efficency;
+
+    @NotNull
+    @NotBlank
     private String literacy;
 
-    private Long efficency;
+    @NotBlank
+    private String username;
+
+    @NotNull
+    @NotBlank
+    private Set<String> subject = new HashSet<>();
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Set<String> getSubject() {
+        return subject;
+    }
+
+    public void setSubject(Set<String> subject) {
+        this.subject = subject;
+    }
 
     public String getLiteracy() {
         return literacy;
@@ -20,5 +55,13 @@ public class TutorDetailsResp {
 
     public void setEfficency(Long efficency) {
         this.efficency = efficency;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

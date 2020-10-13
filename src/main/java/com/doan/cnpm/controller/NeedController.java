@@ -8,6 +8,7 @@ import com.doan.cnpm.service.NeedService;
 import com.doan.cnpm.service.dto.NeedDTO;
 import com.doan.cnpm.service.exception.AccessDeniedException;
 import com.doan.cnpm.service.exception.NeedNotFoundException;
+import com.doan.cnpm.service.response.NeedDetailsResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -41,34 +42,30 @@ public class NeedController {
     }
 
     @GetMapping(value="/v1/need")
-    public List<Need> getALlNeeds(HttpServletRequest request){
+    public List<NeedDetailsResp> getALlNeeds(HttpServletRequest request){
         String username = request.getHeader("username");
         Optional<User> user = userRepository.findOneByUsername(username);
         String userId = String.valueOf(user.get().getId());
         String authority = userAuthorityService.getAuthority(userId);
         if(authority.equals("ROLE_ADMIN")) {
-            return needRepository.findAll();
+            return needService.getAll();
         }
         else if(authority.equals("ROLE_TUTOR")){
-            return needRepository.findAllNeed();
+            return needService.getAllNeed();
         }
         else if(authority.equals("ROLE_STUDENT")){
-            return needRepository.findAllCourse();
+            return needService.getAllCourse();
         }
         throw new AccessDeniedException();
     }
 
     @GetMapping("v1/need/details")
-    public ResponseEntity<Need> getNeedDetails (@RequestParam(name = "id") Long id) {
-        System.out.println("vaoday");
-        Need data = needRepository.findOneById(id);
-        System.out.println("data");
-        System.out.println(data);
-        if(data != null) {
-
-            return new ResponseEntity<>(data, HttpStatus.OK);
+    public NeedDetailsResp getNeedDetails (@RequestParam(name = "id") Long id) {
+        NeedDetailsResp data =  needService.getNeedDetail(id);
+        if(data == null) {
+            throw new NeedNotFoundException();
         }
-        throw new NeedNotFoundException();
+       return data;
     }
 
     @PostMapping("v1/need/create")
@@ -93,7 +90,7 @@ public class NeedController {
     }
 
     @PutMapping("v1/need/update")
-    @ResponseStatus(HttpStatus.UPGRADE_REQUIRED)
+    //@ResponseStatus(HttpStatus.UPGRADE_REQUIRED)
     public void updateNeed (@RequestBody NeedDTO need, HttpServletRequest request, @RequestParam(name = "id") Long id )  {
         String username = request.getHeader("username");
         Optional<User> user = userRepository.findOneByUsername(username);

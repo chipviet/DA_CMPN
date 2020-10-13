@@ -13,6 +13,7 @@ import com.doan.cnpm.service.UserAuthorityService;
 import com.doan.cnpm.service.dto.TutorDetailsDTO;
 import com.doan.cnpm.service.exception.AccessDeniedException;
 import com.doan.cnpm.service.exception.TutorNotFoundException;
+import com.doan.cnpm.service.response.TutorDetailsResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -52,7 +53,7 @@ public class TutorDetailsController {
     };
 
     @GetMapping("v1/tutor")
-    public List<TutorDetailsDTO> getAllTutorDetails(HttpServletRequest request) {
+    public List<TutorDetailsResp> getAllTutorDetails(HttpServletRequest request) {
         String username = request.getHeader("username");
         Optional<User> user = userRepository.findOneByUsername(username);
         String userId = String.valueOf(user.get().getId());
@@ -66,13 +67,13 @@ public class TutorDetailsController {
 
 
     @GetMapping("v1/tutor/details")
-    public ResponseEntity<TutorDetailsDTO> getTutorDetails (HttpServletRequest request) throws TutorNotFoundException {
+    public TutorDetailsResp getTutorDetails (HttpServletRequest request) throws TutorNotFoundException {
 
         String username = request.getHeader("username");
 
-        TutorDetailsDTO data = tutorDetailsService.getTutorDetails(username);
+        TutorDetailsResp data = tutorDetailsService.getTutorDetails(username);
 
-        return new ResponseEntity<>(data,HttpStatus.OK);
+        return data;
     }
     
     @PostMapping("v1/tutor/create")
@@ -93,7 +94,7 @@ public class TutorDetailsController {
     }
 
     @PutMapping("v1/tutor/update")
-    @ResponseStatus(HttpStatus.UPGRADE_REQUIRED)
+    //@ResponseStatus(HttpStatus.UPGRADE_REQUIRED)
     public void updateTutorDetails (@RequestBody TutorDetailsDTO tutor, HttpServletRequest request)  {
         String username = request.getHeader("username");
         Optional<User> user = userRepository.findOneByUsername(username);

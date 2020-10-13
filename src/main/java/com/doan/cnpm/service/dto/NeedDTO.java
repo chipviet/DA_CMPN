@@ -11,7 +11,7 @@ public class NeedDTO {
 
     private Long level;
 
-    private String subject;
+    private Long subject;
 
     private String place;
 
@@ -45,11 +45,11 @@ public class NeedDTO {
         this.level = level;
     }
 
-    public String getSubject() {
+    public Long getSubject() {
         return subject;
     }
 
-    public void setSubject(String subject) {
+    public void setSubject(Long subject) {
         this.subject = subject;
     }
 

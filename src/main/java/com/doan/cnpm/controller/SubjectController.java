@@ -2,6 +2,7 @@ package com.doan.cnpm.controller;
 
 import com.doan.cnpm.domain.Subject;
 import com.doan.cnpm.domain.User;
+import com.doan.cnpm.service.response.SubjectDetailsResp;
 import com.doan.cnpm.repositories.SubjectRepository;
 import com.doan.cnpm.repositories.UserRepository;
 import com.doan.cnpm.service.SubjectService;
@@ -40,29 +41,13 @@ public class SubjectController {
     }
     
     @GetMapping(value="/v1/subject")
-    public List<Subject> getALlSubject(HttpServletRequest request){
-        String username = request.getHeader("username");
-        Optional<User> user = userRepository.findOneByUsername(username);
-        String userId = String.valueOf(user.get().getId());
-        String authority = userAuthorityService.getAuthority(userId);
-        if(authority.equals("ROLE_ADMIN")) {
-            return subjectRepository.findAll();
-        }
-        throw new AccessDeniedException();
+    public List<SubjectDetailsResp> getALlSubject(HttpServletRequest request){
+        return subjectService.getAllSubject();
     }
 
     @GetMapping("v1/subject/details")
-    public ResponseEntity<Subject> getTutorDetails (@RequestParam(name = "id") Long id, HttpServletRequest request) {
-
-        String username = request.getHeader("username");
-        Optional<User> user = userRepository.findOneByUsername(username);
-        String userId = String.valueOf(user.get().getId());
-        String authority = userAuthorityService.getAuthority(userId);
-        if(authority.equals("ROLE_ADMIN")) {
-            Subject data = subjectRepository.findOneById(id);
-            return new ResponseEntity<>(data, HttpStatus.OK);
-        }
-        throw new AccessDeniedException();
+    public SubjectDetailsResp getSubjectDetails (@RequestParam(name = "id") Long id, HttpServletRequest request) {
+       return subjectService.getSubjectDetail(id);
     }
 
     @PostMapping("v1/subject/create")
@@ -80,7 +65,7 @@ public class SubjectController {
     }
 
     @PutMapping("v1/subject/update")
-    @ResponseStatus(HttpStatus.UPGRADE_REQUIRED)
+    //@ResponseStatus(HttpStatus.UPGRADE_REQUIRED)
     public void updateSubject (@RequestBody SubjectDTO subject, HttpServletRequest request,@RequestParam(name = "id") Long id )  {
         String username = request.getHeader("username");
         Optional<User> user = userRepository.findOneByUsername(username);

@@ -3,6 +3,7 @@ package com.doan.cnpm.service;
 import com.doan.cnpm.domain.*;
 import com.doan.cnpm.repositories.CourseRepository;
 import com.doan.cnpm.repositories.NeedRepository;
+import com.doan.cnpm.repositories.TutorDetailsRepository;
 import com.doan.cnpm.repositories.UserRepository;
 import com.doan.cnpm.service.dto.CourseDTO;
 import com.doan.cnpm.service.dto.TutorDetailsDTO;
@@ -10,6 +11,7 @@ import com.doan.cnpm.service.exception.JoinCourseDeniedException;
 import com.doan.cnpm.service.exception.SubjectNotFoundException;
 import com.doan.cnpm.service.exception.TutorNotFoundException;
 import com.doan.cnpm.service.exception.UserNotFoundException;
+import com.doan.cnpm.service.response.CourseDetailResp;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,10 +28,13 @@ public class CourseService {
 
     private final UserRepository userRepository;
 
-    public CourseService(CourseRepository courseRepository, NeedRepository needRepository, UserRepository userRepository) {
+    private final TutorDetailsRepository tutorDetailsRepository;
+
+    public CourseService(CourseRepository courseRepository, NeedRepository needRepository, UserRepository userRepository, TutorDetailsRepository tutorDetailsRepository) {
         this.courseRepository = courseRepository;
         this.needRepository = needRepository;
         this.userRepository = userRepository;
+        this.tutorDetailsRepository = tutorDetailsRepository;
     }
 
     public Course CreateCourse(Long idNeed, Long idUser){
@@ -71,25 +76,25 @@ public class CourseService {
     }
 
     public Course UpdateCourse(CourseDTO course, Long id){
-        Course course1 = courseRepository.findOneById(id);
+        Course data = courseRepository.findOneById(id);
         User tutor = userRepository.getOne(course.getIdTutor());
         if (tutor.getAuthorities().equals("ROLE_TUTOR")){
-            course1.getStudent().clear();
-            course1.setIdNeed(course1.getIdNeed());
-            course1.setIdTutor(course1.getIdTutor());
-            if(course1.getStudent()==null){
-                course1.setStudent(new HashSet<>());
+            data.getStudent().clear();
+            data.setIdNeed(course.getIdNeed());
+            data.setIdTutor(course.getIdTutor());
+            if(data.getStudent()==null){
+                data.setStudent(new HashSet<>());
             }
             course.getStudent().stream().forEach(idStudent->{
-                Optional<User> student = userRepository.findById(Long.parseLong(idStudent));
+                Optional<User> student = userRepository.findById(idStudent);
                 if(student.get().getAuthorities().equals("ROLE_STUDENT")){
-                   course1.addStudent(student.get());
+                    data.addStudent(student.get());
                 }
             });
 
-            courseRepository.save(course1);
+            courseRepository.save(data);
         }
-        return course1;
+        return data;
     }
 
     public Course JoinCourse(Long idCourse,Long idStudent)
@@ -128,29 +133,31 @@ public class CourseService {
         return "Delete fail !";
     }
 
-    public List<CourseDTO> getAllCourse(){
-        List<CourseDTO> data = new ArrayList<>();
+    public List<CourseDetailResp> getAllCourse(){
+        List<CourseDetailResp> data = new ArrayList<>();
         List<Course> courses = courseRepository.findAll();
         for (Course course : courses) {
-            CourseDTO course1 = new CourseDTO();
+            CourseDetailResp course1 = new CourseDetailResp();
             course1.setId(course.getId());
             course1.setIdNeed(course.getIdNeed());
-            course1.setIdTutor(course.getIdTutor());
+            Optional<TutorDetails> tutorDetails = tutorDetailsRepository.findById(course.getIdTutor());
+            course1.setIdTutor(tutorDetails.get().getUsername());
             course1.setStudent(course.getStudent().stream().map(User::getUsername).collect(Collectors.toSet()));
             data.add(course1);
         }
         return data;
     }
 
-    public CourseDTO getCourseDetails(Long id)throws TutorNotFoundException{
-        CourseDTO data = new CourseDTO();
+    public CourseDetailResp getCourseDetails(Long id)throws TutorNotFoundException{
+        CourseDetailResp data = new CourseDetailResp();
         Course course = courseRepository.findOneById(id);
         if(course ==null)
         {
             throw new TutorNotFoundException();
         }
         data.setId(course.getId());
-        data.setIdTutor(course.getIdTutor());
+        Optional<TutorDetails> tutorDetails = tutorDetailsRepository.findById(course.getIdTutor());
+        data.setIdTutor(tutorDetails.get().getUsername());
         data.setIdNeed(course.getIdNeed());
         data.setStudent(course.getStudent().stream().map(User::getUsername).collect(Collectors.toSet()));
         return  data;

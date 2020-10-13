@@ -18,9 +18,6 @@ public class TutorDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "literacy")
-    private String literacy;
-
     @Column(name = "efficency")
     private Long efficency;
 
@@ -34,6 +31,10 @@ public class TutorDetails {
             inverseJoinColumns = {@JoinColumn(name = "id_subject")}
     )
     private Set<Subject> subject = new HashSet<>();
+
+    @ManyToOne
+    @JoinColumn(name = "id_literacy")
+    private Literacy literacy;
 
     public Set<Subject> getSubject() {
         return subject;
@@ -53,14 +54,6 @@ public class TutorDetails {
         this.id = id;
     }
 
-    public String getLiteracy() {
-        return literacy;
-    }
-
-    public void setLiteracy(String literacy) {
-        this.literacy = literacy;
-    }
-
     public Long getEfficency() {
         return efficency;
     }
@@ -77,6 +70,14 @@ public class TutorDetails {
     {
         this.subject.add(subject1);
         subject1.getTutorDetails().add(this);
+    }
+
+    public Literacy getLiteracy() {
+        return literacy;
+    }
+
+    public void setLiteracy(Literacy literacy) {
+        this.literacy = literacy;
     }
 
     public void removeSubject(Subject subject1)

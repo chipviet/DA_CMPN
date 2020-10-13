@@ -1,43 +1,20 @@
-package com.doan.cnpm.domain;
+package com.doan.cnpm.service.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-
-import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
-
-@Data
-@Entity
-@Table(name ="needs")
-public class Need {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class NeedDetailsResp {
     private Long id;
 
-    @Column(name = "id_user")
     private Long idUser;
 
-    @Column(name = "level")
     private Long level;
 
-    @Column(name = "subject")
-    private Long subject;
+    private String subject;
 
-    @Column(name = "place")
     private String place;
 
-    @Column(name = "schedule")
     private Long schedule;
 
-    @Column(name = "status")
     private Boolean status;
 
-
-    @Column(name = "type")
-    private String type;
-
-    @Column(name = "tuition")
     private Long tuition;
 
     public Long getId() {
@@ -64,11 +41,11 @@ public class Need {
         this.level = level;
     }
 
-    public Long getSubject() {
+    public String getSubject() {
         return subject;
     }
 
-    public void setSubject(Long subject) {
+    public void setSubject(String subject) {
         this.subject = subject;
     }
 
@@ -94,13 +71,6 @@ public class Need {
 
     public void setStatus(Boolean status) {
         this.status = status;
-    }
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public Long getTuition() {

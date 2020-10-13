@@ -2,11 +2,13 @@ package com.doan.cnpm.service;
 
 import com.doan.cnpm.domain.Authority;
 import com.doan.cnpm.domain.User;
+import com.doan.cnpm.service.TutorDetailsService;
 import com.doan.cnpm.domain.enumeration.UserStatus;
 import com.doan.cnpm.repositories.AuthorityRepository;
 import com.doan.cnpm.repositories.UserRepository;
 import com.doan.cnpm.security.AuthoritiesConstants;
 import com.doan.cnpm.service.dto.RegisterUserDTO;
+import com.doan.cnpm.service.dto.UserDetailsDTO;
 import com.doan.cnpm.service.exception.UserIsInactiveException;
 import com.doan.cnpm.service.exception.UserNotFoundException;
 import com.doan.cnpm.service.exception.UsernameAlreadyUsedException;
@@ -16,10 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -28,13 +28,14 @@ public class UserService {
 
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
-
+    private TutorDetailsService tutorDetailsService;
     private AuthorityRepository authorityRepository;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository, TutorDetailsService tutorDetailsService) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.authorityRepository = authorityRepository;
+        this.tutorDetailsService = tutorDetailsService;
     }
 
     public User registerUser(RegisterUserDTO dto) {
@@ -78,11 +79,50 @@ public class UserService {
         return user;
     }
 
-    public List<User> getAllUser() throws UserNotFoundException, UserIsInactiveException {
-
-        List<User> listUser = userRepository.findAll();
-        return listUser;
+    public List<UserDetailsDTO> getALlUser(){
+        List<UserDetailsDTO> data = new ArrayList<>();
+        List<User> users = userRepository.findAll();
+        for(User user:users){
+            UserDetailsDTO newUser = new UserDetailsDTO();
+            newUser.setId(user.getId());
+            newUser.setUsername(user.getUsername());
+            newUser.setEmail(user.getEmail());
+            newUser.setFirstName(user.getFirstName());
+            newUser.setLastName(user.getLastName());
+            newUser.setAddress(user.getAddress());
+            newUser.setGender(user.getGender());
+            newUser.setIntroduction(user.getIntroduction());
+            newUser.setDateOfBirth(user.getDateOfBirth());
+            newUser.setPhoneNumber(user.getPhoneNumber());
+            newUser.setPhoto(user.getPhoto());
+            newUser.setStatus(user.getStatus());
+            newUser.setAuthority(user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet()).iterator().next());
+            data.add(newUser);
+        }
+        return data;
     }
+
+    public UserDetailsDTO getUserDetailsById(Long id, String authority) throws UserNotFoundException, UserIsInactiveException {
+
+        User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found with id:" + id));
+
+        UserDetailsDTO newUser = new UserDetailsDTO();
+        newUser.setId(user.getId());
+        newUser.setUsername(user.getUsername());
+        newUser.setEmail(user.getEmail());
+        newUser.setFirstName(user.getFirstName());
+        newUser.setLastName(user.getLastName());
+        newUser.setAddress(user.getAddress());
+        newUser.setGender(user.getGender());
+        newUser.setIntroduction(user.getIntroduction());
+        newUser.setDateOfBirth(user.getDateOfBirth());
+        newUser.setPhoneNumber(user.getPhoneNumber());
+        newUser.setPhoto(user.getPhoto());
+        newUser.setStatus(user.getStatus());
+        newUser.setAuthority(user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet()).iterator().next());
+        return newUser;
+    }
+
 
     public User updateUser(RegisterUserDTO userDTO,Optional<User> user){
         user.get().setFirstName(userDTO.getFirstName());
@@ -109,11 +149,12 @@ public class UserService {
         return "change " + user.get().getUsername() + " status : " +status;
     }
 
-    public String deleteUser(Optional<User> user){
+    public String deleteUser(User user){
         if(user!= null){
-            user.get().removeAuthorities();
-            userRepository.deleteById(user.get().getId());
-            return "Delete success User with username "+ user.get().getUsername() +" !";
+            tutorDetailsService.DeleteTutorDetails(user.getUsername());
+            user.removeAuthorities();
+            userRepository.deleteById(user.getId());
+            return "Delete success User with username "+ user.getUsername() +" !";
         }
         return "Delete fail !";
     }

@@ -1,9 +1,9 @@
-package com.doan.cnpm.service.dto;
+package com.doan.cnpm.service.response;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-public class SubjectDTO {
+public class SubjectDetailsResp {
 
     private Long id;
 

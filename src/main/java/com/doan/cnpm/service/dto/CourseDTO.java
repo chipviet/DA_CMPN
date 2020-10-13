@@ -16,7 +16,7 @@ public class CourseDTO {
 
     private Long idTutor;
 
-    private Set<String> student = new HashSet<>();
+    private Set<Long> student = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -42,11 +42,11 @@ public class CourseDTO {
         this.idTutor = idTutor;
     }
 
-    public Set<String> getStudent() {
+    public Set<Long> getStudent() {
         return student;
     }
 
-    public void setStudent(Set<String> student) {
+    public void setStudent(Set<Long> student) {
         this.student = student;
     }
 }
