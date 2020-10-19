@@ -43,14 +43,15 @@ public class TutorDetailsService {
         this.subjectRepository = subjectRepository;
     }
 
-    public TutorDetails CreateTutorDetails(TutorDetailsDTO tutor, String username)
+
+    public TutorDetails CreateTutorDetails(TutorDetailsDTO tutor, User user)
     {
         //User user = userRepository.findOneByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found with username:" + username));
         TutorDetails newTutor = new TutorDetails();
         newTutor.setEfficency(tutor.getEfficency());
         Optional<Literacy> literacy = literacyRepository.findById((tutor.getLiteracy()));
         newTutor.setLiteracy(literacy.get());
-        newTutor.setUsername(username);
+        newTutor.setUser(user);
 
         System.out.println("toi day");
 
@@ -71,6 +72,7 @@ public class TutorDetailsService {
 
             newTutor.addSubject(subject);
         });
+
         tutorDetailsRepository.save(newTutor);
 //        TutorDetailsDTO tutorDTO = new TutorDetailsDTO();
 //        tutorDTO.setEfficency(newTutor.getEfficency());
@@ -80,7 +82,8 @@ public class TutorDetailsService {
         return newTutor;
     }
     public TutorDetails UpdateTutorDetails(TutorDetailsDTO tutor,String username){
-        TutorDetails Tutor = tutorDetailsRepository.findOneByUsername(username);
+        Optional<User> user = userRepository.findOneByUsername(username);
+        TutorDetails Tutor = tutorDetailsRepository.findOneByUserId(user.get().getId());
         Tutor.setEfficency(tutor.getEfficency());//http://haimai.ddns.net:9090Tutor.getSubject().clear();
         if(Tutor.getSubject()==null){
             Tutor.setSubject(new HashSet<>());
@@ -99,10 +102,11 @@ public class TutorDetailsService {
     }
 
     public void DeleteTutorDetails(String username){
-        TutorDetails Tutor = tutorDetailsRepository.findOneByUsername(username);
+        Optional<User> user = userRepository.findOneByUsername(username);
+        TutorDetails Tutor = tutorDetailsRepository.findOneByUserId(user.get().getId());
         if(Tutor != null){
             Tutor.removeSubject();
-            tutorDetailsRepository.deleteByUsername(username);
+            //tutorDetailsRepository.deleteByUsername(username);
         }
     }
 
@@ -113,7 +117,7 @@ public class TutorDetailsService {
         for (TutorDetails tutorDetail : tutors) {
             TutorDetailsResp tutor = new TutorDetailsResp();
             tutor.setId(tutorDetail.getId());
-            tutor.setUsername(tutorDetail.getUsername());
+            tutor.setUser(tutorDetail.getUser());
             tutor.setLiteracy(tutorDetail.getLiteracy().getLevel());
             tutor.setEfficency(tutorDetail.getEfficency());
             tutor.setSubject(tutorDetail.getSubject().stream().map(Subject::getNameSubject).collect(Collectors.toSet()));
@@ -122,15 +126,28 @@ public class TutorDetailsService {
         return data;
     }
 
+    public TutorDetailsResp getInfoTutorbyId(Long idTutor){
+
+        Optional<TutorDetails> tutors = tutorDetailsRepository.findById(idTutor);
+        TutorDetailsResp resp = new TutorDetailsResp();
+        resp.setId(tutors.get().getId());
+        resp.setUser(tutors.get().getUser());
+        resp.setLiteracy(tutors.get().getLiteracy().getLevel());
+        resp.setEfficency(tutors.get().getEfficency());
+        resp.setSubject(tutors.get().getSubject().stream().map(Subject::getNameSubject).collect(Collectors.toSet()));
+        return resp;
+    }
+
     public TutorDetailsResp getTutorDetails(String username)throws TutorNotFoundException{
         TutorDetailsResp data = new TutorDetailsResp();
-        TutorDetails tutor = tutorDetailsRepository.findOneByUsername(username);
+        Optional<User> user = userRepository.findOneByUsername(username);
+        TutorDetails tutor = tutorDetailsRepository.findOneByUserId(user.get().getId());
         if(tutor ==null)
         {
             throw new TutorNotFoundException();
         }
         data.setId(tutor.getId());
-        data.setUsername(tutor.getUsername());
+        data.setUser(tutor.getUser());
         data.setLiteracy(tutor.getLiteracy().getLevel());
         data.setEfficency(tutor.getEfficency());
         data.setSubject(tutor.getSubject().stream().map(Subject::getNameSubject).collect(Collectors.toSet()));

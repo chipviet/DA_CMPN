@@ -21,8 +21,9 @@ public class TutorDetails {
     @Column(name = "efficency")
     private Long efficency;
 
-    @Column(name = "username")
-    private String username;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinTable(
@@ -62,9 +63,13 @@ public class TutorDetails {
         this.efficency = efficency;
     }
 
-    public String getUsername(){return username;}
+    public User getUser() {
+        return user;
+    }
 
-    public void setUsername(String username){this.username = username; }
+    public void setUser(User user) {
+        this.user = user;
+    }
 
     public void addSubject(Subject subject1)
     {

@@ -7,9 +7,9 @@ public class ScheduleDTO {
 
     private Long id;
 
-    private Long weekday;
+    private Long id_day;
 
-    private Long lesson;
+    private Long id_lesson;
 
     public Long getId() {
         return id;
@@ -19,19 +19,19 @@ public class ScheduleDTO {
         this.id = id;
     }
 
-    public Long getWeekday() {
-        return weekday;
+    public Long getId_day() {
+        return id_day;
     }
 
-    public void setWeekday(Long weekday) {
-        this.weekday = weekday;
+    public void setId_day(Long weekday) {
+        this.id_day = weekday;
     }
 
-    public Long getLesson() {
-        return lesson;
+    public Long getId_lesson() {
+        return id_lesson;
     }
 
-    public void setLesson(Long lesson) {
-        this.lesson = lesson;
+    public void setId_lesson(Long lesson) {
+        this.id_lesson = lesson;
     }
 }

@@ -4,6 +4,7 @@ package com.doan.cnpm.domain;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.sql.Time;
 
 @Data
 @Entity
@@ -14,11 +15,13 @@ public class Schedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "weekday")
-    private Long weekday;
+    @ManyToOne
+    @JoinColumn(name = "id_day")
+    private Day day;
 
-    @Column(name = "lesson")
-    private Long lesson;
+    @ManyToOne
+    @JoinColumn(name = "id_lesson")
+    private Lesson lesson;
 
     public Long getId() {
         return id;
@@ -28,19 +31,19 @@ public class Schedule {
         this.id = id;
     }
 
-    public Long getWeekday() {
-        return weekday;
+    public Day getDay() {
+        return day;
     }
 
-    public void setWeekday(Long weekday) {
-        this.weekday = weekday;
+    public void setDay(Day day) {
+        this.day = day;
     }
 
-    public Long getLesson() {
+    public Lesson getLesson() {
         return lesson;
     }
 
-    public void setLesson(Long lesson) {
+    public void setLesson(Lesson lesson) {
         this.lesson = lesson;
     }
 }

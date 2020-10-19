@@ -151,9 +151,10 @@ public class UserService {
 
     public String deleteUser(User user){
         if(user!= null){
-            tutorDetailsService.DeleteTutorDetails(user.getUsername());
+            //tutorDetailsService.DeleteTutorDetails(user.getUsername());
             user.removeAuthorities();
-            userRepository.deleteById(user.getId());
+            userRepository.delete(user);
+            System.out.println(user);
             return "Delete success User with username "+ user.getUsername() +" !";
         }
         return "Delete fail !";

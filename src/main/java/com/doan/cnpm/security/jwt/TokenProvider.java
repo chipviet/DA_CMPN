@@ -34,9 +34,9 @@ public class TokenProvider {
 
     private UserAuthorityService userAuthorityService;
 
-    private long tokenValidityInMilliseconds = 604800000L;
+    private long tokenValidityInMilliseconds = 60480000000L;
 
-    private long tokenValidityInMillisecondsForRememberMe =604800000L;
+    private long tokenValidityInMillisecondsForRememberMe =60480000000L;
 
 
     public TokenProvider( ) {

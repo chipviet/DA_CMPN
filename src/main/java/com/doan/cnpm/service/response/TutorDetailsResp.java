@@ -1,5 +1,7 @@
 package com.doan.cnpm.service.response;
 
+import com.doan.cnpm.domain.User;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
@@ -19,7 +21,7 @@ public class TutorDetailsResp {
     private String literacy;
 
     @NotBlank
-    private String username;
+    private User user;
 
     @NotNull
     @NotBlank
@@ -57,11 +59,11 @@ public class TutorDetailsResp {
         this.efficency = efficency;
     }
 
-    public String getUsername() {
-        return username;
+    public User getUser() {
+        return user;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUser(User user) {
+        this.user = user;
     }
 }

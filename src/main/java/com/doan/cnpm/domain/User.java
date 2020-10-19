@@ -86,6 +86,9 @@ public class User  implements Serializable {
     @ManyToMany(mappedBy = "student", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private Set<Course> courses = new HashSet<>();
 
+    @OneToOne(mappedBy = "user")
+    private TutorDetails tutorDetails;
+
     public void setId(Long id) {
         this.id = id;
     }

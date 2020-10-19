@@ -65,16 +65,22 @@ public class TutorDetailsController {
 
     }
 
-
     @GetMapping("v1/tutor/details")
-    public TutorDetailsResp getTutorDetails (HttpServletRequest request) throws TutorNotFoundException {
+    public TutorDetailsResp getInfoTutorbyId( @RequestParam(name = "idTutor") Long idTutor, HttpServletRequest request) {
 
-        String username = request.getHeader("username");
-
-        TutorDetailsResp data = tutorDetailsService.getTutorDetails(username);
-
-        return data;
+            return tutorDetailsService.getInfoTutorbyId(idTutor);
     }
+//
+//
+//    @GetMapping("v1/tutor/details")
+//    public TutorDetailsResp getTutorDetails (HttpServletRequest request) throws TutorNotFoundException {
+//
+//        String username = request.getHeader("username");
+//
+//        TutorDetailsResp data = tutorDetailsService.getTutorDetails(username);
+//
+//        return data;
+//    }
     
     @PostMapping("v1/tutor/create")
     @ResponseStatus(HttpStatus.CREATED)
@@ -86,8 +92,8 @@ public class TutorDetailsController {
         String authority = userAuthorityService.getAuthority(userId);
         System.out.println("authority");
         System.out.println(authority);
-        if(authority.equals("ROLE_TUTOR")||authority.equals("ROLE_ADMIN" )){
-            tutorDetailsService.CreateTutorDetails(tutor, username);
+        if(authority.equals("ROLE_TUTOR")){
+            tutorDetailsService.CreateTutorDetails(tutor, user.get());
             return;
         }
         throw new AccessDeniedException();

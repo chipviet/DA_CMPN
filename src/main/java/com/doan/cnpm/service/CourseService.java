@@ -141,7 +141,7 @@ public class CourseService {
             course1.setId(course.getId());
             course1.setIdNeed(course.getIdNeed());
             Optional<TutorDetails> tutorDetails = tutorDetailsRepository.findById(course.getIdTutor());
-            course1.setIdTutor(tutorDetails.get().getUsername());
+            course1.setIdTutor(tutorDetails.get().getUser().getUsername());
             course1.setStudent(course.getStudent().stream().map(User::getUsername).collect(Collectors.toSet()));
             data.add(course1);
         }
@@ -157,7 +157,7 @@ public class CourseService {
         }
         data.setId(course.getId());
         Optional<TutorDetails> tutorDetails = tutorDetailsRepository.findById(course.getIdTutor());
-        data.setIdTutor(tutorDetails.get().getUsername());
+        data.setIdTutor(tutorDetails.get().getUser().getUsername());
         data.setIdNeed(course.getIdNeed());
         data.setStudent(course.getStudent().stream().map(User::getUsername).collect(Collectors.toSet()));
         return  data;

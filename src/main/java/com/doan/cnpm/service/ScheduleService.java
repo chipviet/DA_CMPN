@@ -17,10 +17,9 @@ public class ScheduleService {
 
     public Schedule CreateSchedule(ScheduleDTO schedule) {
         Schedule newSchedule = new Schedule();
-        newSchedule.setWeekday(schedule.getWeekday());
-        newSchedule.setLesson(schedule.getLesson());
-
-        scheduleRepository.save(newSchedule);
+//        newSchedule.setWeekday(schedule.getWeekday());
+//        newSchedule.setLesson(schedule.getLesson());
+//        scheduleRepository.save(newSchedule);
         return newSchedule;
     }
 }
