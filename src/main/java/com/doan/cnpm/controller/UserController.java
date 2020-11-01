@@ -1,11 +1,13 @@
 package com.doan.cnpm.controller;
 
 import com.doan.cnpm.domain.User;
+import com.doan.cnpm.domain.enumeration.UserStatus;
 import com.doan.cnpm.repositories.UserRepository;
 import com.doan.cnpm.service.UserAuthorityService;
 import com.doan.cnpm.service.UserService;
 import com.doan.cnpm.service.dto.RegisterUserDTO;
 import com.doan.cnpm.service.dto.UserDetailsDTO;
+import com.doan.cnpm.service.dto.UserStatusDTO;
 import com.doan.cnpm.service.exception.AccessDeniedException;
 import com.doan.cnpm.service.exception.UserIsInactiveException;
 import com.doan.cnpm.service.exception.UserNotFoundException;
@@ -76,9 +78,12 @@ public class UserController {
         String username = request.getHeader("username");
         Optional<User> user = userRepository.findOneByUsername(username);
         String userId = String.valueOf(user.get().getId());
+        System.out.println(userId);
         String authority = userAuthorityService.getAuthority(userId);
+        System.out.println("authoriry");
+        System.out.println(authority);
         if(authority.equals("ROLE_ADMIN")) {
-            List<UserDetailsDTO> resp = userService.getALlUser();
+            List<UserDetailsDTO> resp = userService.getAllUser();
             return new ResponseEntity<>(resp, HttpStatus.OK);
         }
         throw new AccessDeniedException();
@@ -120,16 +125,16 @@ public class UserController {
         //return "Delete success";
     }
 
-    @PutMapping("v1/user/changeStatus")
-    @ResponseStatus(HttpStatus.UPGRADE_REQUIRED)
-    public String updateUser(@RequestParam(name = "id")Long idUser,@RequestParam(name ="status") String status, HttpServletRequest request){
+    @PutMapping("v1/user/changestatus")
+   // @ResponseStatus(HttpStatus.UPGRADE_REQUIRED)
+    public String updateUser(@RequestParam(name = "id")Long idUser, @RequestBody UserStatusDTO status, HttpServletRequest request){
         String username = request.getHeader("username");
         Optional<User> user = userRepository.findOneByUsername(username);
         String userId = String.valueOf(user.get().getId());
         String authority = userAuthorityService.getAuthority(userId);
         if(authority.equals("ROLE_ADMIN")) {
             Optional<User> user1 = userRepository.findById(idUser);
-            return userService.changeUserStatus(user1,status);
+            return userService.changeUserStatus(user1,status.getName_status());
         }
         throw new AccessDeniedException();
     }

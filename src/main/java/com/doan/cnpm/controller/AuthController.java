@@ -61,8 +61,14 @@ public class AuthController {
     }
 
     @PostMapping("/v1/user/login")
-    public ResponseEntity<JWTToken> login (@Valid @RequestBody LoginDTO dto) {
+    public ResponseEntity<JWTToken> login (@Valid @RequestBody LoginDTO dto) throws UserIsInactiveException, UserNotFoundException{
         try{
+            Optional<User> user = userRepository.findOneByUsername(dto.getUsername());
+            String status = String.valueOf(user.get().getStatus());
+            System.out.println(status);
+            if(!status.equals("ACTIVE")){
+                throw  new UserIsInactiveException();
+            }
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(dto.getUsername(),dto.getPassword());
             Authentication authentication = authenticationManagerBuilder.getObject().authenticate((authenticationToken));
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -71,9 +77,14 @@ public class AuthController {
             httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer" + jwt);
             return new ResponseEntity<>(new JWTToken(jwt),httpHeaders, HttpStatus.OK);
         }
+        catch (UserIsInactiveException e){
+            throw e;
+        }
         catch ( Exception e) {
             throw new UserNotFoundException();
         }
+
+
     }
 
     @PostMapping("/v1/admin/login")
@@ -95,7 +106,10 @@ public class AuthController {
                 throw new AccessDeniedException();
             }
         }
-        catch ( UserNotFoundException e) {
+        catch (AccessDeniedException e) {
+            throw new AccessDeniedException();
+        }
+        catch ( Exception e) {
             throw new UserNotFoundException();
         }
     }
@@ -103,7 +117,12 @@ public class AuthController {
     @PostMapping("/v1/user/register")
     @ResponseStatus(HttpStatus.CREATED)
     public User registerUser(@RequestBody RegisterUserDTO dto) {
-        return userService.registerUser(dto);
+        try{
+            return userService.registerUser(dto);
+        } catch(Exception e) {
+            throw e;
+        }
+
     }
 
     @GetMapping("/v1/users/details")

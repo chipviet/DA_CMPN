@@ -19,6 +19,7 @@ public interface SubjectRepository extends JpaRepository<Subject, Long> {
     @Query("SELECT s from Subject s where s.nameSubject = :nameSubject ")
     Subject findOneBynameSubject (@Param("nameSubject") String nameSubject);
 
+
     @Transactional
     @Modifying
     @Query("DELETE from Subject s where s.nameSubject = :nameSubject ")

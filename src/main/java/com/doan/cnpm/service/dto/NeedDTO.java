@@ -2,6 +2,8 @@ package com.doan.cnpm.service.dto;
 
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 @Service
 public class NeedDTO {
 
@@ -15,11 +17,12 @@ public class NeedDTO {
 
     private String place;
 
-    private Long schedule;
 
     private Boolean status;
 
     private Long tuition;
+
+    private Set<ScheduleDTO> schedule;
 
     public Long getId() {
         return id;
@@ -61,11 +64,11 @@ public class NeedDTO {
         this.place = place;
     }
 
-    public Long getSchedule() {
+    public Set<ScheduleDTO> getSchedule() {
         return schedule;
     }
 
-    public void setSchedule(Long schedule) {
+    public void setSchedule(Set<ScheduleDTO> schedule) {
         this.schedule = schedule;
     }
 

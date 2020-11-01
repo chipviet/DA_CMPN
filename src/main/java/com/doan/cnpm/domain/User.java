@@ -70,7 +70,7 @@ public class User  implements Serializable {
     private LocalDate creationDate;
 
     @JsonIgnore
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.REMOVE)
     @JoinTable(
             name = "user_authority",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},

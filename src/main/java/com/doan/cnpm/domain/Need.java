@@ -7,7 +7,7 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+//@Data
 @Entity
 @Table(name ="needs")
 public class Need {
@@ -27,8 +27,13 @@ public class Need {
     @Column(name = "place")
     private String place;
 
-    @Column(name = "schedule")
-    private Long schedule;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @JoinTable(
+            name = "schedule_need",
+            joinColumns = {@JoinColumn(name = "id_need")},
+            inverseJoinColumns = {@JoinColumn(name = "id_schedule")}
+    )
+    private Set<Schedule> schedule = new HashSet<>();
 
     @Column(name = "status")
     private Boolean status;
@@ -80,11 +85,11 @@ public class Need {
         this.place = place;
     }
 
-    public Long getSchedule() {
+    public Set<Schedule> getSchedule() {
         return schedule;
     }
 
-    public void setSchedule(Long schedule) {
+    public void setSchedule(Set<Schedule> schedule) {
         this.schedule = schedule;
     }
 
@@ -110,4 +115,23 @@ public class Need {
     public void setTuition(Long tuition) {
         this.tuition = tuition;
     }
+
+    public void removeSchedule(Schedule schedule1)
+    {
+        this.getSchedule().remove(schedule1);
+        schedule1.getNeeds().remove(this);
+    }
+
+    public void removeSubject()
+    {
+        for (Schedule schedule1 : new HashSet<>(schedule)){
+            removeSchedule(schedule1);
+        }
+    }
+    public void addSchedule(Schedule schedule1)
+    {
+        this.schedule.add(schedule1);
+        schedule1.getNeeds().add(this);
+    }
+
 }

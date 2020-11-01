@@ -64,7 +64,7 @@ public class TutorDetailsService {
                 subject = new Subject();
                 subject.setTutorDetails(new HashSet<>());
                 try {
-                    throw  new SubjectNotFoundException("Not found Subject with name: "+idSubject);
+                    throw  new SubjectNotFoundException();
                 } catch (SubjectNotFoundException e) {
                     e.printStackTrace();
                 }

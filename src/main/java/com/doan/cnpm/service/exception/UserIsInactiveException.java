@@ -1,9 +1,10 @@
 package com.doan.cnpm.service.exception;
 
-public class UserIsInactiveException extends Exception {
+public class UserIsInactiveException extends RuntimeException {
 
-    public UserIsInactiveException(String message) {
-        super(message);
+    private static final long serialVersionUID = 1L;
+    public UserIsInactiveException() {
+        super("This account is deactivated, please contact our support team!!");
     }
 
 }

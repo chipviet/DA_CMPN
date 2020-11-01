@@ -1,11 +1,8 @@
 package com.doan.cnpm.controller;
 
-import com.doan.cnpm.domain.Literacy;
-import com.doan.cnpm.domain.Subject;
-import com.doan.cnpm.domain.User;
-import com.doan.cnpm.repositories.CourseRepository;
 import com.doan.cnpm.repositories.LiteracyRepository;
-import com.doan.cnpm.service.exception.AccessDeniedException;
+import com.doan.cnpm.service.LiteracyService;
+import com.doan.cnpm.service.response.LiteracyDetailResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,9 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Optional;
 
 @CrossOrigin(origins = "http://haimai.ddns.net:9090", maxAge = 3600)
 @RestController
@@ -28,12 +23,15 @@ public class LiteracyController {
 
     private final LiteracyRepository literacyRepository;
 
-    public LiteracyController(LiteracyRepository literacyRepository){
+    private final LiteracyService literacyService;
+
+    public LiteracyController(LiteracyRepository literacyRepository, LiteracyService literacyService) {
         this.literacyRepository = literacyRepository;
+        this.literacyService = literacyService;
     }
 
     @GetMapping(value="/v1/literacy")
-    public List<Literacy> getALlSubject(HttpServletRequest request){
-        return literacyRepository.findAll();
+    public List<LiteracyDetailResp> getALlSubject(){
+        return literacyService.GetAllLiteracy();
     }
 }

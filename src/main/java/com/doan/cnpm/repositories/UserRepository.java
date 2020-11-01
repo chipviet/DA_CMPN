@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 
 @SuppressWarnings("unused")
@@ -21,6 +22,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 //    User findOneByUsername (@Param("username") String username);
 
     Optional<User> findOneByUsername(String username);
+
+    Optional<User> findByEmail(String email);
+
+    Optional<User> findByPhoneNumber(String phoneNumber);
+
 
     @Query("SELECT t.id from User t where t.username = :username ")
     String getIdByUsername (@Param("username") String username);

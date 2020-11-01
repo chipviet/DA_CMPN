@@ -1,5 +1,8 @@
 package com.doan.cnpm.service.response;
 
+import java.util.List;
+import java.util.Set;
+
 public class NeedDetailsResp {
     private Long id;
 
@@ -11,7 +14,7 @@ public class NeedDetailsResp {
 
     private String place;
 
-    private Long schedule;
+    private List<ScheduleDetailResp> schedule;
 
     private Boolean status;
 
@@ -57,11 +60,11 @@ public class NeedDetailsResp {
         this.place = place;
     }
 
-    public Long getSchedule() {
+    public List<ScheduleDetailResp> getSchedule() {
         return schedule;
     }
 
-    public void setSchedule(Long schedule) {
+    public void setSchedule(List<ScheduleDetailResp> schedule) {
         this.schedule = schedule;
     }
 

@@ -4,9 +4,11 @@ package com.doan.cnpm.domain;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.sql.Time;
+import java.lang.Long;
+import java.util.HashSet;
+import java.util.Set;
 
-@Data
+//@Data
 @Entity
 @Table(name ="schedule")
 public class Schedule {
@@ -15,13 +17,17 @@ public class Schedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+   @ManyToOne
     @JoinColumn(name = "id_day")
     private Day day;
 
     @ManyToOne
     @JoinColumn(name = "id_lesson")
-    private Lesson lesson;
+    private Lesson lessons;
+
+    @ManyToMany(mappedBy = "schedule", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    private Set<Need> needs = new HashSet<>();
+
 
     public Long getId() {
         return id;
@@ -39,11 +45,19 @@ public class Schedule {
         this.day = day;
     }
 
-    public Lesson getLesson() {
-        return lesson;
+    public Lesson getLessons() {
+        return lessons;
     }
 
-    public void setLesson(Lesson lesson) {
-        this.lesson = lesson;
+    public void setLessons(Lesson lessons) {
+        this.lessons = lessons;
+    }
+
+    public Set<Need> getNeeds() {
+        return needs;
+    }
+
+    public void setNeeds(Set<Need> needs) {
+        this.needs = needs;
     }
 }

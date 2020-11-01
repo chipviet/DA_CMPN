@@ -19,4 +19,27 @@ public class Day {
     @OneToMany(mappedBy = "day",cascade = CascadeType.ALL)
     private Collection<Schedule> schedules;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getDay() {
+        return day;
+    }
+
+    public void setDay(String day) {
+        this.day = day;
+    }
+
+    public Collection<Schedule> getSchedules() {
+        return schedules;
+    }
+
+    public void setSchedules(Collection<Schedule> schedules) {
+        this.schedules = schedules;
+    }
 }

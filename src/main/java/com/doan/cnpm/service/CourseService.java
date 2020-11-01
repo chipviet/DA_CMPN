@@ -102,6 +102,7 @@ public class CourseService {
         Course course1 = courseRepository.findOneById(idCourse);
         boolean check = true;
         User student = userRepository.getOne(idStudent);
+
         if(course1.getStudent().size()<5 && course1.getStudent().equals(student)){
            course1.addStudent(student);
         }

@@ -8,7 +8,7 @@ import java.util.Collection;
 
 @Data
 @Entity
-@Table(name ="day")
+@Table(name ="lesson")
 public class Lesson {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,8 +17,9 @@ public class Lesson {
     @Column(name = "lesson")
     private Time lesson;
 
-    @OneToMany(mappedBy = "lesson",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "lessons",cascade = CascadeType.ALL)
     private Collection<Schedule> schedules;
+
 
     public Long getId() {
         return id;

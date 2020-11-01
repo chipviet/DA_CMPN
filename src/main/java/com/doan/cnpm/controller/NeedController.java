@@ -50,12 +50,10 @@ public class NeedController {
         if(authority.equals("ROLE_ADMIN")) {
             return needService.getAll();
         }
-        else if(authority.equals("ROLE_TUTOR")){
-            return needService.getAllNeed();
+        else if(authority.equals("ROLE_TUTOR")||authority.equals("ROLE_STUDENT")){
+            return needService.getAll();
         }
-        else if(authority.equals("ROLE_STUDENT")){
-            return needService.getAllCourse();
-        }
+
         throw new AccessDeniedException();
     }
 
@@ -71,22 +69,24 @@ public class NeedController {
     @PostMapping("v1/need/create")
     @ResponseStatus(HttpStatus.CREATED)
     public void createNeed (@RequestBody NeedDTO need, HttpServletRequest request){
-        String username = request.getHeader("username");
-        Optional<User> user = userRepository.findOneByUsername(username);
-        String userId = String.valueOf(user.get().getId());
-        String authority = userAuthorityService.getAuthority(userId);
-        String type = "";
-        if(authority.equals("ROLE_TUTOR")) {
-            type = "OPEN_COURSE";
+        try{
+            String username = request.getHeader("username");
+            Optional<User> user = userRepository.findOneByUsername(username);
+            String userId = String.valueOf(user.get().getId());
+            String authority = userAuthorityService.getAuthority(userId);
+            if(authority.equals("ROLE_STUDENT")) {
+                needService.CreateNeed(need,user.get().getId());
+                return;
+            }
+            else {
+                throw new AccessDeniedException();
+            }
+        } catch (AccessDeniedException e){
+            throw  e;
         }
-        else if(authority.equals("ROLE_STUDENT")){
-            type = "OPEN_NEED";
+        catch (Exception e) {
+            throw  e;
         }
-        if(type != ""){
-            needService.CreateNeed(need,user.get().getId(),type);
-            return;
-        }
-        throw new AccessDeniedException();
     }
 
     @PutMapping("v1/need/update")
@@ -96,7 +96,7 @@ public class NeedController {
         Optional<User> user = userRepository.findOneByUsername(username);
         String userId = String.valueOf(user.get().getId());
         String authority = userAuthorityService.getAuthority(userId);
-        if(authority.equals("ROLE_ADMIN")) {
+        if(authority.equals("ROLE_STUDENT")) {
             needService.UpdateNeed(need, id);
             return;
         }

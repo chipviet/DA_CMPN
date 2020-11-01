@@ -9,9 +9,7 @@ import com.doan.cnpm.repositories.UserRepository;
 import com.doan.cnpm.security.AuthoritiesConstants;
 import com.doan.cnpm.service.dto.RegisterUserDTO;
 import com.doan.cnpm.service.dto.UserDetailsDTO;
-import com.doan.cnpm.service.exception.UserIsInactiveException;
-import com.doan.cnpm.service.exception.UserNotFoundException;
-import com.doan.cnpm.service.exception.UsernameAlreadyUsedException;
+import com.doan.cnpm.service.exception.*;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -46,6 +44,17 @@ public class UserService {
        if(existingUser.isPresent()) {
            throw new UsernameAlreadyUsedException();
        }
+        Optional<User> email = userRepository.findByEmail(dto.getEmail());
+
+        if(email.isPresent()) {
+            throw new EmailAlreadyExistException();
+        }
+        Optional<User> phoneNumber = userRepository.findByPhoneNumber(dto.getPhoneNumber());
+
+        if(phoneNumber.isPresent()) {
+            throw new PhoneNumberAlreadyExist();
+        }
+
 
         User newUser = new User();
         newUser.setUsername(dto.getUsername().toLowerCase());
@@ -53,6 +62,7 @@ public class UserService {
         newUser.setPassword(encryptedPassword);
         newUser.setFirstName(dto.getFirstName());
         newUser.setLastName(dto.getLastName());
+
         newUser.setEmail(dto.getEmail());
         newUser.setGender(dto.getGender());
         newUser.setPhoto(dto.getPhoto());
@@ -79,7 +89,7 @@ public class UserService {
         return user;
     }
 
-    public List<UserDetailsDTO> getALlUser(){
+    public List<UserDetailsDTO> getAllUser(){
         List<UserDetailsDTO> data = new ArrayList<>();
         List<User> users = userRepository.findAll();
         for(User user:users){
@@ -136,15 +146,18 @@ public class UserService {
         user.get().setLatitude(userDTO.getLatitude());
         user.get().setLongitude(userDTO.getLongitude());
         user.get().setPhoto(userDTO.getPhoto());
-        user.get().setStatus(userDTO.getStatus());
+        //user.get().setStatus(userDTO.getStatus());
 
         userRepository.save(user.get());
         return user.get();
     }
 
     public String changeUserStatus(Optional<User> user,String status){
-        if(UserStatus.valueOf(status)!=null)
-            user.get().setStatus(UserStatus.valueOf(status));
+
+        if(UserStatus.valueOf(status)!=null){
+            UserStatus userStatus = UserStatus.valueOf(status);
+            user.get().setStatus(userStatus);
+        }
         userRepository.save(user.get());
         return "change " + user.get().getUsername() + " status : " +status;
     }
