@@ -12,6 +12,8 @@ import com.doan.cnpm.service.exception.SubjectNotFoundException;
 import com.doan.cnpm.service.exception.TutorNotFoundException;
 import com.doan.cnpm.service.exception.UserNotFoundException;
 import com.doan.cnpm.service.response.CourseDetailResp;
+import com.doan.cnpm.service.response.NeedDetailsResp;
+import com.doan.cnpm.service.response.ScheduleDetailResp;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -140,9 +142,26 @@ public class CourseService {
         for (Course course : courses) {
             CourseDetailResp course1 = new CourseDetailResp();
             course1.setId(course.getId());
-            course1.setIdNeed(course.getIdNeed());
+            Need need = needRepository.findOneById(course.getIdNeed());
+            NeedDetailsResp needDetailsResp = new NeedDetailsResp();
+            needDetailsResp.setId(need.getId());
+            User user = userRepository.getOne(need.getIdUser());
+            needDetailsResp.setNameUser(user.getUsername());
+            needDetailsResp.setLevel(need.getLevel());
+            needDetailsResp.setPlace(need.getPlace());
+            needDetailsResp.setStatus(need.getStatus());
+            needDetailsResp.setTuition(need.getTuition());
+            List<ScheduleDetailResp> scheduleList = new ArrayList<>();
+            for (Schedule schedule : need.getSchedule()) {
+                ScheduleDetailResp scheduleDetail = new ScheduleDetailResp();
+                scheduleDetail.setDay(schedule.getDay().getDay());
+                scheduleDetail.setLesson(schedule.getLessons().getLesson());
+                scheduleList.add(scheduleDetail);
+            }
+            needDetailsResp.setSchedule(scheduleList);
+            course1.setNeedDetailsResp(needDetailsResp);
             Optional<TutorDetails> tutorDetails = tutorDetailsRepository.findById(course.getIdTutor());
-            course1.setIdTutor(tutorDetails.get().getUser().getUsername());
+            course1.setNameTutor(tutorDetails.get().getUser().getUsername());
             course1.setStudent(course.getStudent().stream().map(User::getUsername).collect(Collectors.toSet()));
             data.add(course1);
         }
@@ -158,8 +177,25 @@ public class CourseService {
         }
         data.setId(course.getId());
         Optional<TutorDetails> tutorDetails = tutorDetailsRepository.findById(course.getIdTutor());
-        data.setIdTutor(tutorDetails.get().getUser().getUsername());
-        data.setIdNeed(course.getIdNeed());
+        Need need = needRepository.findOneById(course.getIdNeed());
+        NeedDetailsResp needDetailsResp = new NeedDetailsResp();
+        needDetailsResp.setId(need.getId());
+        User user = userRepository.getOne(need.getIdUser());
+        needDetailsResp.setNameUser(user.getUsername());
+        needDetailsResp.setLevel(need.getLevel());
+        needDetailsResp.setPlace(need.getPlace());
+        needDetailsResp.setStatus(need.getStatus());
+        needDetailsResp.setTuition(need.getTuition());
+        List<ScheduleDetailResp> scheduleList = new ArrayList<>();
+        for (Schedule schedule : need.getSchedule()) {
+            ScheduleDetailResp scheduleDetail = new ScheduleDetailResp();
+            scheduleDetail.setDay(schedule.getDay().getDay());
+            scheduleDetail.setLesson(schedule.getLessons().getLesson());
+            scheduleList.add(scheduleDetail);
+        }
+        needDetailsResp.setSchedule(scheduleList);
+        data.setNeedDetailsResp(needDetailsResp);
+        data.setNameTutor(tutorDetails.get().getUser().getUsername());
         data.setStudent(course.getStudent().stream().map(User::getUsername).collect(Collectors.toSet()));
         return  data;
     }

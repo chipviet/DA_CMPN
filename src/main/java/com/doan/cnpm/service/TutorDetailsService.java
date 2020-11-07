@@ -10,6 +10,7 @@ import com.doan.cnpm.repositories.TutorDetailsRepository;
 import com.doan.cnpm.repositories.UserRepository;
 import com.doan.cnpm.service.dto.TutorDetailsDTO;
 import com.doan.cnpm.service.exception.SubjectNotFoundException;
+import com.doan.cnpm.service.exception.TutorAlreadyCreatedException;
 import com.doan.cnpm.service.exception.TutorNotFoundException;
 import com.doan.cnpm.service.response.TutorDetailsResp;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -47,43 +48,46 @@ public class TutorDetailsService {
     public TutorDetails CreateTutorDetails(TutorDetailsDTO tutor, User user)
     {
         //User user = userRepository.findOneByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found with username:" + username));
-        TutorDetails newTutor = new TutorDetails();
-        newTutor.setEfficency(tutor.getEfficency());
-        Optional<Literacy> literacy = literacyRepository.findById((tutor.getLiteracy()));
-        newTutor.setLiteracy(literacy.get());
-        newTutor.setUser(user);
+        if(tutorDetailsRepository.findOneByUser(user)!=null) {
+            throw new TutorAlreadyCreatedException();
+            //Throw Tutor has created
+        }
+            TutorDetails newTutor = new TutorDetails();
+            newTutor.setEfficency(tutor.getEfficency());
+            Optional<Literacy> literacy = literacyRepository.findById((tutor.getLiteracy()));
+            newTutor.setLiteracy(literacy.get());
+            newTutor.setUser(user);
 
-        System.out.println("toi day");
+            System.out.println("toi day");
 
-        newTutor.setSubject(new HashSet<>());
-        tutor.getSubject().stream().forEach(idSubject ->{
-            Subject subject = subjectRepository.findOneById((Long.parseLong(idSubject)));
-            System.out.println("subject");
-            System.out.println(subject);
-            if(subject == null){
-                subject = new Subject();
-                subject.setTutorDetails(new HashSet<>());
-                try {
-                    throw  new SubjectNotFoundException();
-                } catch (SubjectNotFoundException e) {
-                    e.printStackTrace();
+            newTutor.setSubject(new HashSet<>());
+            tutor.getSubject().stream().forEach(idSubject -> {
+                Subject subject = subjectRepository.findOneById((Long.parseLong(idSubject)));
+                System.out.println("subject");
+                System.out.println(subject);
+                if (subject == null) {
+                    subject = new Subject();
+                    subject.setTutorDetails(new HashSet<>());
+                    try {
+                        throw new SubjectNotFoundException();
+                    } catch (SubjectNotFoundException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
+                newTutor.addSubject(subject);
+            });
 
-            newTutor.addSubject(subject);
-        });
-
-        tutorDetailsRepository.save(newTutor);
+            tutorDetailsRepository.save(newTutor);
 //        TutorDetailsDTO tutorDTO = new TutorDetailsDTO();
 //        tutorDTO.setEfficency(newTutor.getEfficency());
 //        tutorDTO.setLiteracy(newTutor.getLiteracy());
 //        tutorDTO.setSubject(newTutor.getSubject().stream().map(Subject::getNameSubject).collect(Collectors.toSet()));
 
-        return newTutor;
+            return newTutor;
     }
     public TutorDetails UpdateTutorDetails(TutorDetailsDTO tutor,String username){
         Optional<User> user = userRepository.findOneByUsername(username);
-        TutorDetails Tutor = tutorDetailsRepository.findOneByUserId(user.get().getId());
+        TutorDetails Tutor = tutorDetailsRepository.findOneByUserId(user.get());
         Tutor.setEfficency(tutor.getEfficency());//http://haimai.ddns.net:9090Tutor.getSubject().clear();
         if(Tutor.getSubject()==null){
             Tutor.setSubject(new HashSet<>());
@@ -103,7 +107,7 @@ public class TutorDetailsService {
 
     public void DeleteTutorDetails(String username){
         Optional<User> user = userRepository.findOneByUsername(username);
-        TutorDetails Tutor = tutorDetailsRepository.findOneByUserId(user.get().getId());
+        TutorDetails Tutor = tutorDetailsRepository.findOneByUserId(user.get());
         if(Tutor != null){
             Tutor.removeSubject();
             //tutorDetailsRepository.deleteByUsername(username);
@@ -141,7 +145,7 @@ public class TutorDetailsService {
     public TutorDetailsResp getTutorDetails(String username)throws TutorNotFoundException{
         TutorDetailsResp data = new TutorDetailsResp();
         Optional<User> user = userRepository.findOneByUsername(username);
-        TutorDetails tutor = tutorDetailsRepository.findOneByUserId(user.get().getId());
+        TutorDetails tutor = tutorDetailsRepository.findOneByUserId(user.get());
         if(tutor ==null)
         {
             throw new TutorNotFoundException();

@@ -6,7 +6,7 @@ import java.util.Set;
 public class NeedDetailsResp {
     private Long id;
 
-    private Long idUser;
+    private String nameUser;
 
     private Long level;
 
@@ -28,12 +28,12 @@ public class NeedDetailsResp {
         this.id = id;
     }
 
-    public Long getIdUser() {
-        return idUser;
+    public String getNameUser() {
+        return nameUser;
     }
 
-    public void setIdUser(Long idUser) {
-        this.idUser = idUser;
+    public void setNameUser(String nameUser) {
+        this.nameUser = nameUser;
     }
 
     public Long getLevel() {

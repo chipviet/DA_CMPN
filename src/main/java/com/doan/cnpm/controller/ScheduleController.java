@@ -1,5 +1,6 @@
 package com.doan.cnpm.controller;
 
+import com.doan.cnpm.domain.Lesson;
 import com.doan.cnpm.domain.Schedule;
 import com.doan.cnpm.domain.User;
 import com.doan.cnpm.repositories.ScheduleRepository;
@@ -8,6 +9,9 @@ import com.doan.cnpm.service.ScheduleService;
 import com.doan.cnpm.service.UserAuthorityService;
 import com.doan.cnpm.service.dto.ScheduleDTO;
 import com.doan.cnpm.service.exception.AccessDeniedException;
+import com.doan.cnpm.service.response.DayDetailResp;
+import com.doan.cnpm.service.response.LessonDetailResp;
+import com.doan.cnpm.service.response.LiteracyDetailResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -35,13 +39,16 @@ public class ScheduleController {
 
     private final UserAuthorityService userAuthorityService;
 
-    private ScheduleService scheduleService;
+    private final ScheduleService scheduleService;
 
-    public ScheduleController(ScheduleRepository scheduleRepository, UserRepository userRepository, UserAuthorityService userAuthorityService) {
+    public ScheduleController(ScheduleRepository scheduleRepository,
+                              UserRepository userRepository,
+                              UserAuthorityService userAuthorityService,
+                              ScheduleService scheduleService) {
         this.scheduleRepository = scheduleRepository;
-        this.scheduleService = scheduleService;
         this.userRepository = userRepository;
         this.userAuthorityService = userAuthorityService;
+        this.scheduleService = scheduleService;
     }
 
     @GetMapping("v1/schedule")
@@ -76,4 +83,14 @@ public class ScheduleController {
         }
         throw new AccessDeniedException();
     }
+    @GetMapping("v1/lesson")
+    public List<LessonDetailResp> getAllLesson( HttpServletRequest request) {
+        return scheduleService.GetAllLesson();
+    }
+
+    @GetMapping("v1/day")
+    public List<DayDetailResp> getAllDay(HttpServletRequest request) {
+        return scheduleService.GetAllDay();
+    }
+
 }

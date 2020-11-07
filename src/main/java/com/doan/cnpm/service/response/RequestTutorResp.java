@@ -1,17 +1,13 @@
 package com.doan.cnpm.service.response;
 
-import java.util.HashSet;
-import java.util.Set;
-
-public class CourseDetailResp {
-
+public class RequestTutorResp {
     private Long id;
 
     private NeedDetailsResp needDetailsResp;
 
     private String nameTutor;
 
-    private Set<String> student = new HashSet<>();
+    private String status;
 
     public Long getId() {
         return id;
@@ -37,12 +33,11 @@ public class CourseDetailResp {
         this.nameTutor = nameTutor;
     }
 
-
-    public Set<String> getStudent() {
-        return student;
+    public String getStatus() {
+        return status;
     }
 
-    public void setStudent(Set<String> student) {
-        this.student = student;
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

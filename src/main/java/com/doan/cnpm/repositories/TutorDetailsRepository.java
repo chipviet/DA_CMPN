@@ -30,11 +30,14 @@ public interface TutorDetailsRepository extends JpaRepository<TutorDetails, Long
 //    @Query("SELECT t from TutorDetails t where t.literacy = :literacyString ")
 //    TutorDetails findOneById (@Param("literacyString") String literacyString);
 
-    @Query("SELECT t from TutorDetails t where t.user =: idUser ")
-    TutorDetails findOneByUserId (@Param("idUser") Long idUser);
+    @Query("SELECT t from TutorDetails t where t.user = :user ")
+    TutorDetails findOneByUserId (@Param("user") User user);
 
     @Query("SELECT t from TutorDetails t where t.id =: id ")
     TutorDetails findOneByTutorId (@Param("id") Long id);
+
+    @Query("SELECT t from TutorDetails t where t.user = :user")
+    TutorDetails findOneByUser(@Param("user")User user);
 
     @Transactional
     @Modifying

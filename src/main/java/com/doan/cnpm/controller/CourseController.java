@@ -60,7 +60,7 @@ public class CourseController {
         Optional<User> user = userRepository.findOneByUsername(username);
         String userId = String.valueOf(user.get().getId());
         String authority = userAuthorityService.getAuthority(userId);
-        if(authority.equals("ROLE_ADMIN")) {
+        if(authority.equals("ROLE_ADMIN")||authority.equals("ROLE_STUDENT")||authority.equals("ROLE_TUTOR")) {
             return courseService.getCourseDetails(idCourse);
         }
         throw new AccessDeniedException();

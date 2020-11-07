@@ -11,6 +11,8 @@ public class ScheduleDTO {
 
     private Long id_lesson;
 
+    private Double duration;
+
     public Long getId() {
         return id;
     }
@@ -33,5 +35,13 @@ public class ScheduleDTO {
 
     public void setId_lesson(Long lesson) {
         this.id_lesson = lesson;
+    }
+
+    public Double getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Double duration) {
+        this.duration = duration;
     }
 }

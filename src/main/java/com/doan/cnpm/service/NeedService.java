@@ -4,8 +4,7 @@ import com.doan.cnpm.domain.*;
 import com.doan.cnpm.repositories.*;
 import com.doan.cnpm.service.dto.NeedDTO;
 import com.doan.cnpm.service.exception.ScheduleHasBeenDuplicatedException;
-import com.doan.cnpm.service.response.NeedDetailsResp;
-import com.doan.cnpm.service.response.ScheduleDetailResp;
+import com.doan.cnpm.service.response.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,17 +20,27 @@ public class NeedService {
     private final ScheduleRepository scheduleRepository;
     private final DayRepository dayRepository;
     private final LessonRepository lessonRepository;
+    private final UserRepository userRepository;
+    private final CourseRepository courseRepository;
 
-    public NeedService(NeedRepository needRepository, SubjectRepository subjectRepository,
-                       ScheduleRepository scheduleRepository, DayRepository dayRepository, LessonRepository lessonRepository) {
+    public NeedService(NeedRepository needRepository,
+                       SubjectRepository subjectRepository,
+                       ScheduleRepository scheduleRepository,
+                       DayRepository dayRepository,
+                       LessonRepository lessonRepository,
+                       CourseRepository courseRepository,
+                       UserRepository userRepository) {
         this.needRepository = needRepository;
         this.subjectRepository = subjectRepository;
         this.scheduleRepository = scheduleRepository;
         this.dayRepository = dayRepository;
         this.lessonRepository = lessonRepository;
+        this.userRepository = userRepository;
+        this.courseRepository = courseRepository;
     }
 
-//    public List<NeedDetailsResp> getAll() {
+
+    //    public List<NeedDetailsResp> getAll() {
 //       List<Need> needs = needRepository.findAll();
 //       List<NeedDetailsResp> data = new ArrayList<>();
 //        for (Need need: needs) {
@@ -58,7 +67,8 @@ public class NeedService {
             if(need.getType().equals("OPEN_NEED")) {
                 NeedDetailsResp needDetailsResp = new NeedDetailsResp();
                 needDetailsResp.setId(need.getId());
-                needDetailsResp.setIdUser(need.getIdUser());
+                User user = userRepository.getOne(need.getIdUser());
+                needDetailsResp.setNameUser(user.getUsername());
                 needDetailsResp.setLevel(need.getLevel());
                 needDetailsResp.setPlace(need.getPlace());
                 needDetailsResp.setSchedule(needDetailsResp.getSchedule());
@@ -78,7 +88,8 @@ public class NeedService {
         for (Need need: needs) {
                 NeedDetailsResp needDetailsResp = new NeedDetailsResp();
                 needDetailsResp.setId(need.getId());
-                needDetailsResp.setIdUser(need.getIdUser());
+                User user = userRepository.getOne(need.getIdUser());
+                needDetailsResp.setNameUser(user.getUsername());
                 needDetailsResp.setLevel(need.getLevel());
                 needDetailsResp.setPlace(need.getPlace());
                 List<ScheduleDetailResp> scheduleList = new ArrayList<>();
@@ -86,6 +97,8 @@ public class NeedService {
                 ScheduleDetailResp scheduleDetail = new ScheduleDetailResp();
                 scheduleDetail.setDay(schedule.getDay().getDay());
                 scheduleDetail.setLesson(schedule.getLessons().getLesson());
+                System.out.println("schedule");
+                System.out.println(schedule.getLessons().getLesson());
                 scheduleList.add(scheduleDetail);
             }
                 needDetailsResp.setSchedule(scheduleList);
@@ -102,7 +115,8 @@ public class NeedService {
         Need need = needRepository.findOneById(id);
         NeedDetailsResp needDetailsResp = new NeedDetailsResp();
         needDetailsResp.setId(need.getId());
-        needDetailsResp.setIdUser(need.getIdUser());
+        User user = userRepository.getOne(need.getIdUser());
+        needDetailsResp.setNameUser(user.getUsername());
         needDetailsResp.setLevel(need.getLevel());
         needDetailsResp.setPlace(need.getPlace());
         List<ScheduleDetailResp> scheduleList = new ArrayList<>();
@@ -111,7 +125,8 @@ public class NeedService {
             scheduleDetail.setDay(schedule.getDay().getDay());
             scheduleDetail.setLesson(schedule.getLessons().getLesson());
             scheduleList.add(scheduleDetail);
-        }needDetailsResp.setStatus(need.getStatus());
+        }
+        needDetailsResp.setStatus(need.getStatus());
         needDetailsResp.setTuition(need.getTuition());
         Subject subject = subjectRepository.findOneById(need.getSubject());
         needDetailsResp.setSubject(subject.getNameSubject());
@@ -130,33 +145,35 @@ public class NeedService {
             newNeed.setTuition(need.getTuition());
             need.getSchedule().stream().forEach(dayLesson->{
                 Optional<Day> day = dayRepository.findById(dayLesson.getId_day());
-                Optional<Lesson> lesson =lessonRepository.findById(dayLesson.getId_lesson());
-                List<Schedule> schedules = scheduleRepository.findByIdDayIdLesson(day.get(),lesson.get());
-                System.out.println("schedule");
-                System.out.println(schedules);
-                if(!schedules.isEmpty()) {
-                    if (schedules.get(0) != null) {
-                        schedules.get(0).getNeeds().stream().forEach(user -> {
-                            if (user.getIdUser() == idUser) {
-                                throw new ScheduleHasBeenDuplicatedException(); //exception here
-                            }
-                        });
+                Long id_lesson = dayLesson.getId_lesson();
+                for(double i = 0;i<dayLesson.getDuration();i=i+0.5 ) {
+                    Optional<Lesson> lesson = lessonRepository.findById(id_lesson);
+                    List<Schedule> schedules = scheduleRepository.findByIdDayIdLesson(day.get(), lesson.get());
+                    System.out.println("schedule");
+                    System.out.println(schedules);
+                    if (!schedules.isEmpty()) {
+                        if (schedules.get(0) != null) {
+                            schedules.get(0).getNeeds().stream().forEach(user -> {
+                                if (user.getIdUser() == idUser) {
+                                    throw new ScheduleHasBeenDuplicatedException(); //exception here
+                                }
+                            });
+                        }
                     }
+                    if (schedules.isEmpty()) {
+                        Schedule newSchedule = new Schedule();
+                        newSchedule.setDay(day.get());
+                        newSchedule.setLessons(lesson.get());
+                        scheduleRepository.save(newSchedule);
+                        schedules = scheduleRepository.findByIdDayIdLesson(day.get(), lesson.get());
+                    }
+                    if (newNeed.getSchedule() == null)
+                        newNeed.setSchedule(new HashSet<>());
+                    for (Schedule schedule : schedules) {
+                        newNeed.addSchedule(schedule);
+                    }
+                    id_lesson++;
                 }
-                if(schedules.isEmpty()){
-                    Schedule newSchedule = new Schedule();
-                    newSchedule.setDay(day.get());
-                    newSchedule.setLessons(lesson.get());
-                    scheduleRepository.save(newSchedule);
-                    schedules = scheduleRepository.findByIdDayIdLesson(day.get(),lesson.get());
-                }
-                if(newNeed.getSchedule()==null)
-                    newNeed.setSchedule(new HashSet<>());
-                for (Schedule schedule: schedules
-                ) {
-                    newNeed.addSchedule(schedule);
-                }
-
             });
             needRepository.save(newNeed);
             return newNeed;
@@ -180,7 +197,11 @@ public class NeedService {
         return need1;
     }
 
+
     public void DeleteNeed(Long id){
+
+        Course course = courseRepository.findOneByidNeed(id);
+        courseRepository.deleteById(course.getId());
         needRepository.deleteById(id);
     }
 }
