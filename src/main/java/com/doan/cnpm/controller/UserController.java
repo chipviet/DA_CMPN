@@ -1,24 +1,32 @@
 package com.doan.cnpm.controller;
 
+import com.doan.cnpm.domain.Device;
 import com.doan.cnpm.domain.User;
 import com.doan.cnpm.domain.enumeration.UserStatus;
 import com.doan.cnpm.repositories.UserRepository;
+import com.doan.cnpm.service.DeviceService;
 import com.doan.cnpm.service.UserAuthorityService;
 import com.doan.cnpm.service.UserService;
 import com.doan.cnpm.service.dto.RegisterUserDTO;
 import com.doan.cnpm.service.dto.UserDetailsDTO;
 import com.doan.cnpm.service.dto.UserStatusDTO;
 import com.doan.cnpm.service.exception.AccessDeniedException;
+import com.doan.cnpm.service.exception.BadRequestAlertException;
 import com.doan.cnpm.service.exception.UserIsInactiveException;
 import com.doan.cnpm.service.exception.UserNotFoundException;
+import io.github.jhipster.web.util.HeaderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.WebAttributes;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +43,7 @@ public class UserController {
 
     private UserRepository userRepository;
 
+    private DeviceService deviceService;
 
     public UserController( UserAuthorityService userAuthorityService, UserRepository userRepository ) {
         this.userAuthorityService = userAuthorityService;
@@ -46,6 +55,14 @@ public class UserController {
         this.userService = userService;
     }
 
+    @Autowired
+    public void setDeviceService(DeviceService deviceService) {
+        this.deviceService = deviceService;
+    }
+    @Autowired
+    public void setDeviceService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
     @GetMapping("/v1/user/details")
     public  ResponseEntity<User> getUserDetails(HttpServletRequest request)
             throws UserNotFoundException, UserIsInactiveException {
@@ -138,4 +155,33 @@ public class UserController {
         }
         throw new AccessDeniedException();
     }
+
+    /**
+     * {@code POST  /devices} : Create a new device.
+     *
+     * @param device the device to create.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new device, or with status {@code 400 (Bad Request)} if the device has already an ID.
+     * @throws  if the Location URI syntax is incorrect.
+     */
+    @PostMapping("/v1/user/devices")
+    public ResponseEntity<Device> createDevice(HttpServletRequest request,@Valid @RequestBody Device device) throws URISyntaxException {
+        if (device.getId() != null) {
+            throw new BadRequestAlertException("A new device cannot already have an ID", "device", "idexists");
+        }
+        try {
+            String username = request.getHeader("username");
+            System.out.println("username" + username);
+            Optional<User> user = userRepository.findOneByUsername(username);
+            device.setUser(user.get());
+            System.out.println("Toi day");
+            Device result = deviceService.save(device);
+            return ResponseEntity.created(new URI("/api/devices/" + result.getId()))
+                    .headers(HeaderUtil.createEntityCreationAlert("Tutor Finder", true, "device", result.getId().toString()))
+                    .body(result);
+        } catch (Exception e) {
+            throw new BadRequestAlertException("The user device already exists","device","userdeviceexist");
+        }
+
+    }
+
 }

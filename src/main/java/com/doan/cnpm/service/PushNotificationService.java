@@ -1,12 +1,15 @@
 package com.doan.cnpm.service;
 
+import com.doan.cnpm.domain.Device;
 import org.springframework.stereotype.Service;
 
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 import java.util.Scanner;
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -76,7 +79,7 @@ public class PushNotificationService {
         return jsonResponse;
     }
 
-    public static void sendMessageToUser(String message, String userId) {
+    public static void sendMessageToUser(String message, List<Device> devices) {
         try {
             String jsonResponse;
 
@@ -90,15 +93,20 @@ public class PushNotificationService {
             con.setRequestProperty("Authorization", "Basic " + API_KEY);
             con.setRequestMethod("POST");
 
+
+            List<String> deviceUuids = devices.stream()
+                    .map(Device::getDevice_uuid)
+                    .collect(Collectors.toList());
+
+            // String[] array = deviceUuids.toArray(new String[0]);
+            System.out.println("REST request to update device cc " + converToJsonStringify(deviceUuids));
+
             String strJsonBody = "{" +
                     "\"app_id\": \"" + APP_ID + "\"," +
-                    "\"include_player_ids\": [\"" + userId + "\"]," +
+                    "\"include_player_ids\":" + converToJsonStringify(deviceUuids) + "," +
                     "\"data\": {\"foo\": \"bar\"}," +
                     "\"contents\": {\"en\": \"" + message + "\"}" +
                     "}";
-
-
-            System.out.println("strJsonBody:\n" + strJsonBody);
 
             byte[] sendBytes = strJsonBody.getBytes("UTF-8");
             con.setFixedLengthStreamingMode(sendBytes.length);
@@ -107,14 +115,21 @@ public class PushNotificationService {
             outputStream.write(sendBytes);
 
             int httpResponse = con.getResponseCode();
-            System.out.println("httpResponse: " + httpResponse);
 
             jsonResponse = mountResponseRequest(con, httpResponse);
-            System.out.println("jsonResponse:\n" + jsonResponse);
-
         } catch (Throwable t) {
             t.printStackTrace();
         }
+    }
+
+    private static String converToJsonStringify(List<String> deviceUuids) {
+        String result = "[";
+        for (String s : deviceUuids) {
+            result = result + "\"" + s + "\",";
+        }
+        result = result.substring(0, result.length() - 1);
+        result = result + "]";
+        return result;
     }
 }
 
